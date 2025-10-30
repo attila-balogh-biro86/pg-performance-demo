@@ -301,9 +301,7 @@ public class AuditService {
                         orPredicates.add(criteriaBuilder.equal(root.get(ID_TYPE), type));
                     }
                 }
-                if (!orPredicates.isEmpty()) {
-                    predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
-                }
+                predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
 
             if (StringUtils.isNotBlank(idValue)) {

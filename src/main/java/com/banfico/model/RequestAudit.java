@@ -147,7 +147,7 @@ public class RequestAudit {
     @Column(name = "transaction_ref_id")
     private String transactionRefId;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id",referencedColumnName = "id",updatable = false, insertable = false)
     private List<TransactionNote> transactionNotes = new ArrayList<>();
 

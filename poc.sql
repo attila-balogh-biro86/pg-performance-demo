@@ -172,7 +172,6 @@ FROM generate_series(1, 5000000) g;
 select count(*) from cop_request_audit cra
 
 
-truncate table cop_request_audit_transaction_notes 
 truncate table cop_request_audit cascade
 
 

@@ -1,0 +1,52 @@
+package com.banfico.service;
+
+import com.banfico.cache.FilterHash;
+import com.banfico.dto.AuditDto;
+import com.banfico.model.RequestAudit;
+import com.banfico.model.TransactionFilter;
+import com.banfico.repo.CustomRequestAuditRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.List;
+
+@Service
+public class CustomAuditService {
+
+    private final CustomRequestAuditRepository repo;
+    private final RedisTemplate<String, Long> redis;
+    private final FilterHash filterHash;
+
+    public CustomAuditService(CustomRequestAuditRepository repo, RedisTemplate<String, Long> redis, FilterHash filterHash) {
+        this.repo = repo;
+        this.redis = redis;
+        this.filterHash = filterHash;
+    }
+
+    public Page<AuditDto> search(TransactionFilter f, Pageable pageable) {
+
+        Slice<RequestAudit> dbPage = repo.search(
+                f.iban(), f.assigneeBic(), f.requestedOrgName(), f.userId(), f.clientId(), f.amount(), f.currency(), pageable);
+        String key = filterHash.keyFor(f);
+
+        Long cachedTotal = redis.opsForValue().get(key);
+
+        long total = (cachedTotal != null) ? cachedTotal : repo.countByFilters(f.iban(), f.assigneeBic(), f.requestedOrgName(),
+                f.userId(), f.clientId(), f.amount(), f.currency());
+
+        redis.opsForValue().set(key, total, Duration.ofMinutes(15));
+
+        List<AuditDto> auditDto = dbPage.getContent().stream()
+                .map(AuditDto::new)
+                .toList();
+
+        // Re-wrap with cached total (so subsequent page navigations reuse it)
+        return new PageImpl<>(auditDto, pageable, total);
+    }
+}
+
