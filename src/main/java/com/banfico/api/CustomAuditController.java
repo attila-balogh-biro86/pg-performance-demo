@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,12 +41,13 @@ public class CustomAuditController {
             @RequestParam(value = "clientId", required = false) String clientId,
             @RequestParam(value = "amount", required = false) BigDecimal amount,
             @RequestParam(value = "currency", required = false) String currency,
-            @RequestParam(name = "startTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromTime,
-            @RequestParam(name = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toTime,
+            @RequestParam(name = "startTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromTime,
+            @RequestParam(name = "endTime", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toTime,
             @PageableDefault(sort = {DEFAULT_SORT_VALUE}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
 
-        TransactionFilter transactionFilter = new TransactionFilter(bic, iban, requestedOrgName, userId, clientId, amount, currency);
+        TransactionFilter transactionFilter = new TransactionFilter(bic, iban, requestedOrgName, userId, clientId, amount, currency,
+                fromTime, toTime);
         return auditService.search(transactionFilter, pageable);
     }
 

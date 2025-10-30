@@ -4,7 +4,8 @@ import com.banfico.cache.FilterHash;
 import com.banfico.dto.AuditDto;
 import com.banfico.model.RequestAudit;
 import com.banfico.model.TransactionFilter;
-import com.banfico.repo.CustomRequestAuditRepository;
+import com.banfico.repo.RequestAuditRepository;
+import com.banfico.repo.RequestAuditSpecs;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +19,11 @@ import java.util.List;
 @Service
 public class CustomAuditService {
 
-    private final CustomRequestAuditRepository repo;
+    private final RequestAuditRepository repo;
     private final RedisTemplate<String, Long> redis;
     private final FilterHash filterHash;
 
-    public CustomAuditService(CustomRequestAuditRepository repo, RedisTemplate<String, Long> redis, FilterHash filterHash) {
+    public CustomAuditService(RequestAuditRepository repo, RedisTemplate<String, Long> redis, FilterHash filterHash) {
         this.repo = repo;
         this.redis = redis;
         this.filterHash = filterHash;
@@ -30,15 +31,14 @@ public class CustomAuditService {
 
     public Page<AuditDto> search(TransactionFilter f, Pageable pageable) {
 
-        Slice<RequestAudit> dbPage = repo.search(
-                f.iban(), f.assigneeBic(), f.requestedOrgName(), f.userId(), f.clientId(), f.amount(), f.currency(), pageable);
+        Slice<RequestAudit> dbPage = repo.findAll(
+               RequestAuditSpecs.withFilters(f),
+                pageable
+        );
         String key = filterHash.keyFor(f);
 
         Long cachedTotal = redis.opsForValue().get(key);
-
-        long total = (cachedTotal != null) ? cachedTotal : repo.countByFilters(f.iban(), f.assigneeBic(), f.requestedOrgName(),
-                f.userId(), f.clientId(), f.amount(), f.currency());
-
+        long total = (cachedTotal != null) ? cachedTotal : repo.count(RequestAuditSpecs.withFilters(f));
         redis.opsForValue().set(key, total, Duration.ofMinutes(15));
 
         List<AuditDto> auditDto = dbPage.getContent().stream()
