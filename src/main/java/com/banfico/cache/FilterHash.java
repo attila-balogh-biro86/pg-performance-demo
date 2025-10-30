@@ -3,9 +3,11 @@ package com.banfico.cache;
 import com.banfico.model.TransactionFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
+@EqualsAndHashCode
 @Component
 public class FilterHash {
     private final ObjectMapper mapper = new ObjectMapper();
@@ -17,7 +19,8 @@ public class FilterHash {
         if (f.currency() != null) node.put("currency", f.currency());
         if (f.assigneeBic() != null) node.put("assigneeBic", f.assigneeBic());
         if (f.amount() != null) node.put("amount", f.amount().toPlainString());
-        if (f.clientId() != null) node.put("clientId", f.clientId());
+        if (f.requestTimeReceivedStartFrom() != null) node.put("requestTimeReceivedStartFrom", f.requestTimeReceivedStartFrom().toString());
+        if (f.requestTimeReceivedStartTo() != null) node.put("requestTimeReceivedStartTo", f.requestTimeReceivedStartTo().toString());
 
         try {
             String json = mapper.writeValueAsString(node);
