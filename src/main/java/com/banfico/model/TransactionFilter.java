@@ -1,10 +1,7 @@
 package com.banfico.model;
 
-import jakarta.persistence.Column;
-
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public record TransactionFilter(
         String assigneeBic,
@@ -14,7 +11,7 @@ public record TransactionFilter(
         String clientId,
         BigDecimal amount,
         String currency,
-        LocalDate requestTimeReceivedStartFrom,
-        LocalDate requestTimeReceivedStartTo
+        OffsetDateTime requestTimeReceivedStartFrom,
+        OffsetDateTime requestTimeReceivedStartTo
 ) {}
 
