@@ -4,6 +4,7 @@ import com.banfico.model.RequestAudit;
 import com.banfico.model.TransactionFilter;
 import com.banfico.repo.RequestAuditBlazePredicates;
 import com.blazebit.persistence.CriteriaBuilderFactory;
+import com.blazebit.persistence.KeysetPage;
 import com.blazebit.persistence.PagedList;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -25,13 +26,13 @@ public class BlazeAuditService {
     }
 
     public PagedList<RequestAudit> search(TransactionFilter filter,
-                                                   Integer page, Integer size) {
+                                          Integer page, Integer size, KeysetPage keysetPage) {
 
         return RequestAuditBlazePredicates
                 .withFilters(em, cbf, filter)
                 .orderByAsc("ra.id")
                 .orderByDesc("ra.requestTimeReceived")
-                .page(page.intValue(), size.intValue())
+                .page(keysetPage, page, size)
                 .withKeysetExtraction(true)
                 .getResultList();
     }

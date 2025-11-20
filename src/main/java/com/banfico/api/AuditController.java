@@ -4,7 +4,11 @@ import com.banfico.dto.AuditDto;
 import com.banfico.dto.KeysetPageResponse;
 import com.banfico.model.RequestAudit;
 import com.banfico.model.TransactionFilter;
+import com.banfico.serialization.KeySetSerializationUtil;
 import com.banfico.service.BlazeAuditService;
+import com.blazebit.persistence.DefaultKeyset;
+import com.blazebit.persistence.DefaultKeysetPage;
+import com.blazebit.persistence.Keyset;
 import com.blazebit.persistence.KeysetPage;
 import com.blazebit.persistence.PagedList;
 import com.blazebit.persistence.spring.data.base.query.KeysetAwarePageImpl;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +43,8 @@ public class AuditController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public KeysetAwarePage<RequestAudit> searchAudit(
+            @RequestParam(value = "lowKeySet", required = false) String lowestKeySet,
+            @RequestParam(value = "highKeySet", required = false) String highestKeySet,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
             @RequestParam(value = "assigneeBic", required = false) String bic,
@@ -54,9 +61,21 @@ public class AuditController {
         TransactionFilter transactionFilter = new TransactionFilter(bic, iban, requestedOrgName, userId, clientId, amount, currency,
                 fromTime, toTime);
 
-        PagedList<RequestAudit> result = auditService.search(transactionFilter, page, size);
-
+        KeysetPage keysetPage = createKeysetPage(lowestKeySet, highestKeySet, page, size);
+        PagedList<RequestAudit> result = auditService.search(transactionFilter, page, size, keysetPage);
         return new KeysetAwarePageImpl<>(result, Pageable.ofSize(result.size()));
+    }
+
+
+    private KeysetPage createKeysetPage(String lowestKeySet, String highestKeySet, int page, int size) {
+        if(lowestKeySet == null || highestKeySet == null) {
+            return null;
+        }
+        Serializable[] lowestTuple = KeySetSerializationUtil.deserialize(lowestKeySet);
+        Serializable[] highestTuple = KeySetSerializationUtil.deserialize(highestKeySet);
+        Keyset low = new DefaultKeyset(lowestTuple);
+        Keyset high = new DefaultKeyset(highestTuple);
+        return new DefaultKeysetPage(page, size, low , high);
     }
 
 }

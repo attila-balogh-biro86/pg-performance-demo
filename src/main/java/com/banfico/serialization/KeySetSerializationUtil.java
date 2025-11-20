@@ -3,6 +3,7 @@ package com.banfico.serialization;
 import com.blazebit.persistence.Keyset;
 import org.apache.commons.lang.SerializationUtils;
 
+import java.io.Serializable;
 import java.util.Base64;
 
 public class KeySetSerializationUtil {
@@ -17,10 +18,10 @@ public class KeySetSerializationUtil {
         }
     }
 
-    public static Object[] deserialize( String token ) {
+    public static Serializable [] deserialize(String token ) {
         try {
             byte[] bytes = Base64.getUrlDecoder().decode(token);
-            return (Object[]) SerializationUtils.deserialize( bytes );
+            return (Serializable[]) SerializationUtils.deserialize( bytes );
         } catch(Exception e) {
             throw new IllegalArgumentException("Invalid keyset token", e);
         }
