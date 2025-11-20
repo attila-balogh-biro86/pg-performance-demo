@@ -54,9 +54,9 @@ public class AuditController {
         TransactionFilter transactionFilter = new TransactionFilter(bic, iban, requestedOrgName, userId, clientId, amount, currency,
                 fromTime, toTime);
 
-        PagedList<RequestAudit> result = auditService.search(transactionFilter, null, page, size);
+        PagedList<RequestAudit> result = auditService.search(transactionFilter, page, size);
 
-        return new KeysetAwarePageImpl<RequestAudit>(result, Pageable.ofSize(result.size()));
+        return new KeysetAwarePageImpl<>(result, Pageable.ofSize(result.size()));
     }
 
 }

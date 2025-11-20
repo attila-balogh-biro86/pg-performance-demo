@@ -1,11 +1,11 @@
-package com.banfico.dto;
+package com.banfico.serialization;
 
 import com.blazebit.persistence.Keyset;
 import org.apache.commons.lang.SerializationUtils;
 
 import java.util.Base64;
 
-public class KeysetPageToken {
+public class KeySetSerializationUtil {
 
     public static String serialize( Keyset keyset ) {
         // keyset.getTuple() returns Object[] of values
