@@ -72,7 +72,9 @@ public class AuditController {
             return null;
         }
         Serializable[] lowestTuple = KeySetSerializationUtil.deserialize(lowestKeySet);
+        lowestTuple[1] = OffsetDateTime.parse(lowestTuple[1].toString());
         Serializable[] highestTuple = KeySetSerializationUtil.deserialize(highestKeySet);
+        highestTuple[1] = OffsetDateTime.parse(highestTuple[1].toString());
         Keyset low = new DefaultKeyset(lowestTuple);
         Keyset high = new DefaultKeyset(highestTuple);
         return new DefaultKeysetPage(page, size, low , high);

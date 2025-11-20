@@ -17,7 +17,6 @@ public class KeySetSerializationUtil {
             throw new IllegalStateException("Failed to serialize keyset", e);
         }
     }
-
     public static Serializable [] deserialize(String token ) {
         try {
             byte[] bytes = Base64.getUrlDecoder().decode(token);

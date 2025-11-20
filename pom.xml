@@ -128,12 +128,6 @@
 			<version>20030203.000129</version>
 		</dependency>
 
-		<!-- Redis -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-
 		<!-- JSON + Hashing utilities -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -142,11 +136,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-docker-compose</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 
 	</dependencies>
